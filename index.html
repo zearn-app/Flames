@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FLAMES Calculator 🔥</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
+
+<style>
+body {
+  margin: 0;
+  height: 100vh;
+  font-family: 'Poppins', sans-serif;
+  background: radial-gradient(circle at top, #1a0000, #000);
+  overflow: hidden;
+  color: white;
+}
+
+/* Floating hearts */
+.heart {
+  position: absolute;
+  color: rgba(255, 0, 100, 0.6);
+  animation: float 6s linear infinite;
+}
+
+@keyframes float {
+  0% { transform: translateY(100vh) scale(0.5); opacity: 0; }
+  50% { opacity: 1; }
+  100% { transform: translateY(-10vh) scale(1.2); opacity: 0; }
+}
+
+/* Container */
+.container {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+}
+
+/* Title glow */
+h1 {
+  font-size: 3rem;
+  color: #ff4d6d;
+  text-shadow: 0 0 20px #ff1a1a;
+}
+
+/* Inputs */
+input {
+  padding: 10px;
+  margin: 10px;
+  border-radius: 10px;
+  border: none;
+  outline: none;
+  font-size: 1rem;
+}
+
+/* Button */
+button {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 20px;
+  background: linear-gradient(45deg, #ff1a1a, #ff6600);
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+  box-shadow: 0 0 15px red;
+  transition: 0.3s;
+}
+
+button:hover {
+  transform: scale(1.1);
+}
+
+/* Result box */
+.result {
+  margin-top: 20px;
+  font-size: 1.5rem;
+  opacity: 0;
+  transition: 0.5s;
+}
+
+/* Flames animation */
+.flame {
+  font-size: 2rem;
+  animation: flame 1s infinite alternate;
+}
+
+@keyframes flame {
+  from { text-shadow: 0 0 10px orange; }
+  to { text-shadow: 0 0 25px red; }
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+  <h1 class="flame">🔥 FLAMES 🔥</h1>
+
+  <input type="text" id="name1" placeholder="Enter Name 1">
+  <input type="text" id="name2" placeholder="Enter Name 2">
+  <br>
+  <button onclick="calculateFlames()">Check Relationship ❤️</button>
+
+  <div class="result" id="result"></div>
+</div>
+
+<script>
+// Floating hearts generator
+function createHearts() {
+  const heart = document.createElement("div");
+  heart.classList.add("heart");
+  heart.innerHTML = "❤";
+  heart.style.left = Math.random() * 100 + "vw";
+  heart.style.fontSize = (Math.random() * 20 + 10) + "px";
+  document.body.appendChild(heart);
+
+  setTimeout(() => {
+    heart.remove();
+  }, 6000);
+}
+setInterval(createHearts, 300);
+
+// FLAMES logic
+function calculateFlames() {
+  let name1 = document.getElementById("name1").value.toLowerCase().replace(/ /g,'');
+  let name2 = document.getElementById("name2").value.toLowerCase().replace(/ /g,'');
+
+  let arr1 = name1.split('');
+  let arr2 = name2.split('');
+
+  // Remove common letters
+  for (let i = 0; i < arr1.length; i++) {
+    let index = arr2.indexOf(arr1[i]);
+    if (index !== -1) {
+      arr1[i] = '';
+      arr2[index] = '';
+    }
+  }
+
+  let count = (arr1.join('') + arr2.join('')).length;
+
+  let flames = ['F','L','A','M','E','S'];
+  let meanings = {
+    F: "Friend ❤️",
+    L: "Love 💖",
+    A: "Affection 💕",
+    M: "Marriage 💍",
+    E: "Enemy 💔",
+    S: "Sister 🤝"
+  };
+
+  let index = 0;
+
+  while (flames.length > 1) {
+    index = (index + count - 1) % flames.length;
+    flames.splice(index, 1);
+  }
+
+  let final = flames[0];
+
+  let resultDiv = document.getElementById("result");
+  resultDiv.style.opacity = 1;
+  resultDiv.innerHTML = "Result: " + meanings[final] + " 🔥";
+}
+</script>
+
+</body>
+</html>
