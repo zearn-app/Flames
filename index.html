@@ -103,11 +103,11 @@ button:disabled {
   font-size: 1.5rem;    
   opacity: 0;    
   transform: scale(0.5);  
-  transition: 0.5s;    
+  transition: all 0.5s ease;    
 }    
   
 .result.show {  
-  opacity: 1;  
+  opacity: 1 !important;
   transform: scale(1.2);  
   text-shadow: 0 0 20px red;  
 }  
@@ -127,12 +127,12 @@ button:disabled {
 <body>    
     
 <div class="container">    
-  <h1 class="flame">🔥 FLAMES </h1>    
+  <h1 class="flame">🔥 FLAMES 🔥</h1>    
     
   <input type="text" id="name1" placeholder="Your Name">    
   <input type="text" id="name2" placeholder="Her / His Name">    
   <br>    
-  <button id="btn" onclick="startCalculation()">Check Relationship ❤️</button>    
+  <button id="btn">Check Relationship ❤️</button>    
   
   <div class="progress-text" id="progressText">Calculating your relationship... ❤️</div>  
   <div class="progress-bar" id="progressBar">  
@@ -150,10 +150,11 @@ function createHearts() {
   heart.style.left = Math.random() * 100 + "vw";    
   heart.style.fontSize = (Math.random() * 20 + 10) + "px";    
   document.body.appendChild(heart);    
-    
   setTimeout(() => heart.remove(), 6000);    
 }    
 setInterval(createHearts, 300);    
+
+document.getElementById("btn").addEventListener("click", startCalculation);
 
 function startCalculation() {  
   const name1 = document.getElementById("name1").value.trim();
@@ -172,32 +173,49 @@ function startCalculation() {
 
   btn.disabled = true;
 
+  // FULL RESET (important fix)
   resultDiv.classList.remove("show");  
-  resultDiv.style.opacity = 0;  
+  resultDiv.style.opacity = "0";
   resultDiv.innerHTML = "";
 
-  progressText.style.opacity = 1;  
-  progressBar.style.opacity = 1;  
+  progressText.style.opacity = "1";  
+  progressBar.style.opacity = "1";  
   progressFill.style.width = "0%";  
 
   let progress = 0;  
 
   let interval = setInterval(() => {  
-    progress += 4;  
+    progress += 5;  
     progressFill.style.width = progress + "%";  
 
     if (progress >= 100) {  
       clearInterval(interval);  
+
       setTimeout(() => {  
-        progressText.style.opacity = 0;  
-        progressBar.style.opacity = 0;  
-        calculateFlames();  
+        progressText.style.opacity = "0";  
+        progressBar.style.opacity = "0";  
+
+        showResult(); // ← guaranteed call
+
         btn.disabled = false;
-      }, 600);  
+      }, 500);  
     }  
   }, 60);  
 }  
-  
+
+function showResult() {
+  const resultDiv = document.getElementById("result");
+
+  const final = calculateFlames();
+
+  resultDiv.innerHTML = "Result: " + final + " 🔥";
+
+  // force reflow (important fix)
+  resultDiv.offsetHeight;
+
+  resultDiv.classList.add("show");
+}
+
 function calculateFlames() {    
   let name1 = document.getElementById("name1").value.toLowerCase().replace(/ /g,'');    
   let name2 = document.getElementById("name2").value.toLowerCase().replace(/ /g,'');    
@@ -232,14 +250,7 @@ function calculateFlames() {
     flames.splice(index, 1);    
   }    
     
-  let final = flames[0];    
-    
-  const resultDiv = document.getElementById("result");    
-  resultDiv.innerHTML = "Result: " + meanings[final] + " 🔥";    
-
-  setTimeout(() => {
-    resultDiv.classList.add("show");
-  }, 100);
+  return meanings[flames[0]];
 }    
 </script>    
     
