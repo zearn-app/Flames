@@ -173,7 +173,6 @@ function startCalculation() {
 
   btn.disabled = true;
 
-  // FULL RESET (important fix)
   resultDiv.classList.remove("show");  
   resultDiv.style.opacity = "0";
   resultDiv.innerHTML = "";
@@ -195,7 +194,7 @@ function startCalculation() {
         progressText.style.opacity = "0";  
         progressBar.style.opacity = "0";  
 
-        showResult(); // ← guaranteed call
+        showResult();
 
         btn.disabled = false;
       }, 500);  
@@ -205,17 +204,14 @@ function startCalculation() {
 
 function showResult() {
   const resultDiv = document.getElementById("result");
-
   const final = calculateFlames();
 
   resultDiv.innerHTML = "Result: " + final + " 🔥";
-
-  // force reflow (important fix)
   resultDiv.offsetHeight;
-
   resultDiv.classList.add("show");
 }
 
+// ✅ CORRECT FLAMES SYSTEM
 function calculateFlames() {    
   let name1 = document.getElementById("name1").value.toLowerCase().replace(/ /g,'');    
   let name2 = document.getElementById("name2").value.toLowerCase().replace(/ /g,'');    
@@ -231,9 +227,19 @@ function calculateFlames() {
     }    
   }    
     
-  let count = (arr1.join('') + arr2.join('')).length || 1;    
-    
-  let flames = ['F','L','A','M','E','S'];    
+  let count = (arr1.join('') + arr2.join('')).length;    
+  if (count === 0) count = 1;
+
+  let flames = ['F','L','A','M','E','S'];  
+
+  let index = 0;
+
+  while (flames.length > 1) {
+    index = (index + count - 1) % flames.length;
+    flames.splice(index, 1);
+    // IMPORTANT: do NOT reset index — continue from same position
+  }
+
   let meanings = {    
     F: "Friend ❤️",    
     L: "Love 💖",    
@@ -242,14 +248,7 @@ function calculateFlames() {
     E: "Enemy 💔",    
     S: "Sister 🤝"    
   };    
-    
-  let index = 0;    
-    
-  while (flames.length > 1) {    
-    index = (index + count - 1) % flames.length;    
-    flames.splice(index, 1);    
-  }    
-    
+
   return meanings[flames[0]];
 }    
 </script>    
