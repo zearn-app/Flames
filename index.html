@@ -70,14 +70,11 @@ button:hover {
 
 button:disabled {
   opacity: 0.6;
-  cursor: not-allowed;
 }
     
 .progress-text {  
   margin-top: 15px;  
-  font-size: 1rem;  
   opacity: 0;  
-  transition: 0.3s;
 }  
   
 .progress-bar {  
@@ -88,26 +85,41 @@ button:disabled {
   margin: 10px auto;  
   overflow: hidden;  
   opacity: 0;  
-  transition: 0.3s;
 }  
   
 .progress-fill {  
   height: 100%;  
   width: 0%;  
   background: linear-gradient(90deg, red, orange);  
-  transition: width 0.1s linear;  
 }  
+
+/* NEW: Flames animation text */
+.flames-anim {
+  margin-top: 10px;
+  font-size: 1.2rem;
+  letter-spacing: 8px;
+  opacity: 0;
+  transition: 0.3s;
+}
+.flames-anim span {
+  display: inline-block;
+  transition: 0.3s;
+}
+.flames-anim .removed {
+  opacity: 0;
+  transform: scale(0);
+}
     
 .result {    
   margin-top: 20px;    
   font-size: 1.5rem;    
   opacity: 0;    
   transform: scale(0.5);  
-  transition: all 0.5s ease;    
+  transition: 0.5s;    
 }    
   
 .result.show {  
-  opacity: 1 !important;
+  opacity: 1;
   transform: scale(1.2);  
   text-shadow: 0 0 20px red;  
 }  
@@ -138,6 +150,9 @@ button:disabled {
   <div class="progress-bar" id="progressBar">  
     <div class="progress-fill" id="progressFill"></div>  
   </div>  
+
+  <!-- NEW animation line -->
+  <div class="flames-anim" id="flamesAnim"></div>
     
   <div class="result" id="result"></div>    
 </div>    
@@ -157,100 +172,96 @@ setInterval(createHearts, 300);
 document.getElementById("btn").addEventListener("click", startCalculation);
 
 function startCalculation() {  
-  const name1 = document.getElementById("name1").value.trim();
-  const name2 = document.getElementById("name2").value.trim();
-
-  if (!name1 || !name2) {
-    alert("Enter both names 😅");
-    return;
-  }
-
-  const btn = document.getElementById("btn");
-  const progressText = document.getElementById("progressText");  
-  const progressBar = document.getElementById("progressBar");  
-  const progressFill = document.getElementById("progressFill");  
-  const resultDiv = document.getElementById("result");  
+  const n1 = name1.value.trim();
+  const n2 = name2.value.trim();
+  if (!n1 || !n2) return alert("Enter both names 😅");
 
   btn.disabled = true;
+  result.classList.remove("show");
+  result.innerHTML = "";
 
-  resultDiv.classList.remove("show");  
-  resultDiv.style.opacity = "0";
-  resultDiv.innerHTML = "";
+  progressText.style.opacity = 1;
+  progressBar.style.opacity = 1;
+  progressFill.style.width = "0%";
 
-  progressText.style.opacity = "1";  
-  progressBar.style.opacity = "1";  
-  progressFill.style.width = "0%";  
-
-  let progress = 0;  
-
-  let interval = setInterval(() => {  
-    progress += 5;  
-    progressFill.style.width = progress + "%";  
-
-    if (progress >= 100) {  
-      clearInterval(interval);  
-
-      setTimeout(() => {  
-        progressText.style.opacity = "0";  
-        progressBar.style.opacity = "0";  
-
-        showResult();
-
-        btn.disabled = false;
-      }, 500);  
-    }  
-  }, 60);  
-}  
-
-function showResult() {
-  const resultDiv = document.getElementById("result");
-  const final = calculateFlames();
-
-  resultDiv.innerHTML = "Result: " + final + " 🔥";
-  resultDiv.offsetHeight;
-  resultDiv.classList.add("show");
+  let p = 0;
+  let int = setInterval(()=>{
+    p+=5;
+    progressFill.style.width = p+"%";
+    if(p>=100){
+      clearInterval(int);
+      setTimeout(()=>{
+        progressText.style.opacity=0;
+        progressBar.style.opacity=0;
+        animateFlames(); // NEW
+      },400);
+    }
+  },60);
 }
 
-// ✅ CORRECT FLAMES SYSTEM
-function calculateFlames() {    
-  let name1 = document.getElementById("name1").value.toLowerCase().replace(/ /g,'');    
-  let name2 = document.getElementById("name2").value.toLowerCase().replace(/ /g,'');    
-    
-  let arr1 = name1.split('');    
-  let arr2 = name2.split('');    
-    
-  for (let i = 0; i < arr1.length; i++) {    
-    let index = arr2.indexOf(arr1[i]);    
-    if (index !== -1) {    
-      arr1[i] = '';    
-      arr2[index] = '';    
-    }    
-  }    
-    
-  let count = (arr1.join('') + arr2.join('')).length;    
-  if (count === 0) count = 1;
-
-  let flames = ['F','L','A','M','E','S'];  
-
+// 🔥 VISUAL + LOGIC COMBINED
+function animateFlames(){
+  let flames = ['F','L','A','M','E','S'];
+  let count = getCount();
   let index = 0;
 
-  while (flames.length > 1) {
+  flamesAnim.style.opacity = 1;
+  renderFlames(flames);
+
+  function step(){
+    if(flames.length === 1){
+      showResult(flames[0]);
+      return;
+    }
+
     index = (index + count - 1) % flames.length;
-    flames.splice(index, 1);
-    // IMPORTANT: do NOT reset index — continue from same position
+
+    let spans = flamesAnim.querySelectorAll("span");
+    spans[index].classList.add("removed");
+
+    setTimeout(()=>{
+      flames.splice(index,1);
+      renderFlames(flames);
+      setTimeout(step,500);
+    },400);
   }
 
-  let meanings = {    
-    F: "Friend ❤️",    
-    L: "Love 💖",    
-    A: "Affection 💕",    
-    M: "Marriage 💍",    
-    E: "Enemy 💔",    
-    S: "Sister 🤝"    
-  };    
+  setTimeout(step,600);
+}
 
-  return meanings[flames[0]];
-}    
+function renderFlames(arr){
+  flamesAnim.innerHTML = arr.map(l=>`<span>${l}</span>`).join('');
+}
+
+function getCount(){
+  let a = name1.value.toLowerCase().replace(/ /g,'').split('');
+  let b = name2.value.toLowerCase().replace(/ /g,'').split('');
+
+  for(let i=0;i<a.length;i++){
+    let idx = b.indexOf(a[i]);
+    if(idx!=-1){
+      a[i]='';
+      b[idx]='';
+    }
+  }
+  let count = (a.join('')+b.join('')).length;
+  return count || 1;
+}
+
+function showResult(letter){
+  const meanings = {
+    F:"Friend ❤️",
+    L:"Love 💖",
+    A:"Affection 💕",
+    M:"Marriage 💍",
+    E:"Enemy 💔",
+    S:"Sister 🤝"
+  };
+
+  result.innerHTML = "Result: "+meanings[letter]+" 🔥";
+  result.classList.add("show");
+  btn.disabled = false;
+}
 </script>    
     
 </body>    
