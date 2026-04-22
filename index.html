@@ -166,11 +166,26 @@ button:disabled {
   </div>
 
 </div>    
-   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js"></script> 
-<script>    
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+<script type="module">
+
+
+    // 🔥 Firebase Imports
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import { getFirestore, addDoc, collection } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+// 🔥 Your Firebase Config
+const firebaseConfig = {
+  apiKey: "YOUR_API_KEY",
+  authDomain: "zearn-app.firebaseapp.com",
+  projectId: "zearn-app",
+  storageBucket: "zearn-app.firebasestorage.app",
+  messagingSenderId: "212045636123",
+  appId: "1:212045636123:web:094d48241261d61b050ebe"
+};
+
+// 🔥 Initialize
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
@@ -184,9 +199,8 @@ function createHearts() {
   document.body.appendChild(heart);    
   setTimeout(() => heart.remove(), 6000);    
 }    
-setInterval(createHearts, 300);    
-
-btn.addEventListener("click", startCalculation);
+setInterval(createHearts, 300);   
+    document.getElementById("btn").addEventListener("click", startCalculation);
 
 let finalText = "";
 let finalEmoji = "❤️";
