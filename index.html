@@ -304,7 +304,23 @@ function createEmojiRain(e){
     let d=document.createElement("div");
     d.className="emoji-fall";
     d.innerHTML=e;
-    d.style.left=Math.random()*100+"vw";
+    
+
+
+d.style.left = Math.random() * 100 + "vw";
+d.style.fontSize = (Math.random() * 20 + 15) + "px";
+
+// random speed
+d.style.animationDuration = (Math.random() * 3 + 3) + "s";
+
+// random delay (this breaks straight-line effect)
+d.style.animationDelay = (Math.random() * 2) + "s";
+
+// slight horizontal drift variation
+d.style.transform = `translateX(${Math.random()*50 - 25}px)`;
+
+
+
     document.body.appendChild(d);
     setTimeout(()=>d.remove(),5000);
   }
