@@ -188,7 +188,7 @@ const name2 = document.getElementById("name2");
 const btn = document.getElementById("btn");
 const result = document.getElementById("result");
 const progressFill = document.getElementById("progressFill");
-const shareBox = document.getElementById("shareBox");
+
 
 /* THEME CHANGE */
 function applyTheme(letter){
@@ -285,7 +285,7 @@ async function showResult(letter){
 
   createEmojiRain(finalEmoji);
 
-  shareBox.style.display="block";
+  
 
   await addDoc(collection(db,"flamesResults"),{
     name1:name1.value,
@@ -322,36 +322,7 @@ d.style.transform = `translateX(${Math.random()*50 - 25}px)`;
   }
 }
 
-function shareWhatsApp(){
-  const text=`🔥 FLAMES Result 🔥\n${name1.value} ❤️ ${name2.value}\n👉 ${finalText}`;
- 
 
-window.location.href = `https://wa.me/?text=${encodeURIComponent(text)}`;
-}
-
-function copyResult(){
-  const text = `🔥 FLAMES Result 🔥
-${name1.value} ❤️ ${name2.value}
-👉 ${finalText}`;
-
-  if(navigator.clipboard){
-    navigator.clipboard.writeText(text)
-      .then(()=> alert("Copied 📋"))
-      .catch(()=> fallbackCopy(text));
-  } else {
-    fallbackCopy(text);
-  }
-}
-
-function fallbackCopy(text){
-  const textarea = document.createElement("textarea");
-  textarea.value = text;
-  document.body.appendChild(textarea);
-  textarea.select();
-  document.execCommand("copy");
-  document.body.removeChild(textarea);
-  alert("Copied 📋");
-}
 </script>    
 </body>    
 </html>
