@@ -230,7 +230,7 @@ function startCalculation(){
 
   let p=0;
   let int=setInterval(()=>{
-    p+=5;
+    p+=20;
     progressFill.style.width=p+"%";
     if(p>=100){
       clearInterval(int);
@@ -253,8 +253,8 @@ function animateFlames(){
     setTimeout(()=>{
       flames.splice(index,1);
       if(index>=flames.length) index=0;
-      setTimeout(step,500);
-    },500);
+      setTimeout(step,120);
+    },120);
   }
   step();
 }
@@ -284,7 +284,7 @@ async function showResult(letter){
   finalText=meanings[letter][0];
   finalEmoji=meanings[letter][1];
 
-  result.innerHTML="Relationship: "+finalText+" 🔥";
+  result.innerHTML="Relationship: "+finalText";
   result.classList.add("show");
 
   createEmojiRain(finalEmoji);
@@ -328,14 +328,33 @@ d.style.transform = `translateX(${Math.random()*50 - 25}px)`;
 
 function shareWhatsApp(){
   const text=`🔥 FLAMES Result 🔥\n${name1.value} ❤️ ${name2.value}\n👉 ${finalText}`;
-  window.open(`https://wa.me/?text=${encodeURIComponent(text)}`);
-}
+ 
+
+window.location.href = `https://wa.me/?text=${encodeURIComponent(text)}`;
 
 function copyResult(){
-  navigator.clipboard.writeText(finalText);
-  alert("Copied 📋");
+  const text = `🔥 FLAMES Result 🔥
+${name1.value} ❤️ ${name2.value}
+👉 ${finalText}`;
+
+  if(navigator.clipboard){
+    navigator.clipboard.writeText(text)
+      .then(()=> alert("Copied 📋"))
+      .catch(()=> fallbackCopy(text));
+  } else {
+    fallbackCopy(text);
+  }
 }
 
+function fallbackCopy(text){
+  const textarea = document.createElement("textarea");
+  textarea.value = text;
+  document.body.appendChild(textarea);
+  textarea.select();
+  document.execCommand("copy");
+  document.body.removeChild(textarea);
+  alert("Copied 📋");
+}
 </script>    
 </body>    
 </html>
