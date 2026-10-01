@@ -1,36 +1,48 @@
-<!DOCTYPE html>    
-<html lang="en">    
-<head>    
-<meta charset="UTF-8">    
-<meta name="viewport" content="width=device-width, initial-scale=1.0">    
-<title>FLAMES Calculator</title>    
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>FLAMES Calculator</title>
 
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">    
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
 
-<style>    
+<style>
 :root{
   --accent:#9d4edd;
   --accent2:#c77dff;
 }
 
-body {    
-  margin: 0;    
-  height: 100vh;    
-  font-family: 'Poppins', sans-serif;    
-  background: radial-gradient(circle at top, #14001f, #000);    
-  overflow: hidden;    
-  color: white;    
+*{ box-sizing:border-box; }
+
+html, body { margin:0; min-height:100%; }
+
+body {
+  min-height:100vh;
+  min-height:100dvh;
+  font-family:'Poppins', sans-serif;
+  background: radial-gradient(circle at top, #14001f, #000) fixed;
+  overflow-x:hidden;
+  color:white;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:80px 16px 32px;
+  position:relative;
 }
 
 /* BACKGROUND GLOW */
 body::before{
   content:"";
-  position:absolute;
+  position:fixed;
+  top:0; left:0;
   width:200%;
   height:200%;
   background: radial-gradient(circle, var(--accent), transparent);
   opacity:0.15;
   animation: bgMove 10s linear infinite;
+  pointer-events:none;
+  z-index:0;
 }
 @keyframes bgMove{
   0%{transform:translate(-25%,-25%)}
@@ -39,10 +51,13 @@ body::before{
 }
 
 /* FLOAT */
-.heart, .emoji-fall, .spark {    
-  position: absolute;    
-  animation: float 6s linear infinite;    
-}    
+.heart, .emoji-fall, .spark {
+  position:fixed;
+  top:0;
+  pointer-events:none;
+  z-index:1;
+  animation: float 6s linear infinite;
+}
 
 .spark{
   width:4px;
@@ -56,62 +71,69 @@ body::before{
     transform: translateY(100vh) translateX(0px) scale(0.5) rotate(0deg);
     opacity: 0;
   }
-  30% {
-    opacity: 1;
-  }
-  50% {
-    transform: translateY(50vh) translateX(20px) rotate(120deg);
-  }
-  75% {
-    transform: translateY(20vh) translateX(-20px) rotate(240deg);
-  }
+  30% { opacity: 1; }
+  50% { transform: translateY(50vh) translateX(20px) rotate(120deg); }
+  75% { transform: translateY(20vh) translateX(-20px) rotate(240deg); }
   100% {
     transform: translateY(-10vh) translateX(10px) scale(1.2) rotate(360deg);
     opacity: 0;
   }
 }
 
-.container {    
-  position: absolute;    
-  top: 50%;    
-  left: 50%;    
-  transform: translate(-50%, -50%);    
-  text-align: center;    
+.container {
+  position:relative;
+  z-index:2;
+  width:100%;
+  max-width:420px;
+  text-align:center;
 }
 
-h1 {    
-  font-size: 3rem;    
-  color: #c77dff;    
-  text-shadow: 0 0 20px var(--accent);    
-}    
+h1 {
+  font-size:clamp(2rem, 9vw, 3rem);
+  margin:0 0 16px;
+  color:#c77dff;
+  text-shadow:0 0 20px var(--accent);
+}
 
-input {    
-  padding: 10px;    
-  margin: 10px;    
-  border-radius: 10px;    
-  border: none;    
-  outline: none;    
-}    
-
-button {    
-  padding: 10px 20px;    
-  border-radius: 20px;    
+input {
+  display:block;
+  width:100%;
+  padding:14px 16px;
+  margin:10px 0;
+  border-radius:12px;
   border:none;
-  background: linear-gradient(45deg, var(--accent), var(--accent2));    
-  color: white;    
-  cursor: pointer;    
-  box-shadow: 0 0 15px var(--accent);    
-  transition: 0.3s;    
-}    
+  outline:none;
+  font-family:inherit;
+  font-size:16px; /* prevents iOS zoom on focus */
+}
+input:focus{ box-shadow:0 0 0 3px var(--accent2); }
 
-button:hover { transform: scale(1.1); }  
+button {
+  width:100%;
+  min-height:48px;
+  margin-top:6px;
+  padding:12px 20px;
+  border-radius:24px;
+  border:none;
+  font-family:inherit;
+  font-size:1rem;
+  background:linear-gradient(45deg, var(--accent), var(--accent2));
+  color:white;
+  cursor:pointer;
+  box-shadow:0 0 15px var(--accent);
+  transition:0.3s;
+  -webkit-tap-highlight-color:transparent;
+}
+button:hover { transform:scale(1.03); }
+button:active { transform:scale(0.97); }
 
 .progress-bar{
-  width:250px;
+  width:100%;
+  max-width:250px;
   height:10px;
   background:#1f0833;
   border-radius:10px;
-  margin:10px auto;
+  margin:18px auto 10px;
   overflow:hidden;
 }
 .progress-fill{
@@ -122,48 +144,48 @@ button:hover { transform: scale(1.1); }
 
 .result{
   margin-top:20px;
-  font-size:1.5rem;
+  font-size:clamp(1.15rem, 5vw, 1.5rem);
   opacity:0;
   transform:scale(0.5);
   transition:0.5s;
 }
 .result.show{
   opacity:1;
-  transform:scale(1.2);
+  transform:scale(1.05);
   text-shadow:0 0 20px var(--accent);
 }
-
-.share-box{ display:none; }
 
 /* DEVELOPER ID */
 .dev{
   position:fixed;
-  top:16px;
+  top:calc(12px + env(safe-area-inset-top, 0px));
   left:50%;
   transform:translateX(-50%);
   z-index:10;
   display:flex;
   align-items:center;
   gap:10px;
+  max-width:calc(100% - 24px);
   padding:6px 16px 6px 6px;
   border-radius:50px;
   background:rgba(255,255,255,0.08);
   border:1px solid rgba(255,255,255,0.15);
   backdrop-filter:blur(6px);
+  -webkit-backdrop-filter:blur(6px);
   color:white;
   text-decoration:none;
   font-size:0.85rem;
+  white-space:nowrap;
   transition:0.3s;
 }
-.dev:hover{
-  box-shadow:0 0 15px var(--accent);
-}
+.dev:hover{ box-shadow:0 0 15px var(--accent); }
 .dev img{
   width:36px;
   height:36px;
   border-radius:50%;
   object-fit:cover;
   border:2px solid var(--accent);
+  flex-shrink:0;
 }
 .dev small{
   display:block;
@@ -171,27 +193,46 @@ button:hover { transform: scale(1.1); }
   font-weight:300;
   opacity:0.7;
 }
-</style>    
-</head>    
 
-<body>    
+/* Tablet and up: names side by side */
+@media (min-width:600px){
+  .container{ max-width:560px; }
+  .fields{ display:flex; gap:12px; }
+  .fields input{ flex:1; }
+  button{ width:auto; min-width:240px; }
+}
 
-<div class="container" id="mainBox">    
-  <h1>💜 FLAMES</h1>    
+/* Very small phones */
+@media (max-width:360px){
+  body{ padding-top:72px; }
+  .dev{ font-size:0.75rem; padding-right:12px; }
+  .dev img{ width:30px; height:30px; }
+}
 
-  <input type="text" id="name1" placeholder="Your Name">    
-  <input type="text" id="name2" placeholder="Her / His Name">    
-  <br>    
-  <button id="btn">Check Relationship 💜</button>    
+@media (prefers-reduced-motion:reduce){
+  body::before{ animation:none; }
+}
+</style>
+</head>
 
-  <div class="progress-bar">  
-    <div class="progress-fill" id="progressFill"></div>  
-  </div>  
+<body>
+
+<div class="container" id="mainBox">
+  <h1>💜 FLAMES</h1>
+
+  <div class="fields">
+    <input type="text" id="name1" placeholder="Your Name" autocomplete="off">
+    <input type="text" id="name2" placeholder="Her / His Name" autocomplete="off">
+  </div>
+  <button id="btn">Check Relationship 💜</button>
+
+  <div class="progress-bar">
+    <div class="progress-fill" id="progressFill"></div>
+  </div>
 
   <div class="flames-anim" id="flamesAnim"></div>
-  <div class="result" id="result"></div>    
-
-</div>    
+  <div class="result" id="result"></div>
+</div>
 
 <a class="dev" href="https://www.instagram.com/2k_onito_.064?stkn=MTR1bHNvb29hZmFzMQ==" target="_blank" rel="noopener noreferrer">
   <img src="dp.jpg" alt="2k_onito_.064" onerror="this.style.display='none'">
@@ -223,7 +264,6 @@ const btn = document.getElementById("btn");
 const result = document.getElementById("result");
 const progressFill = document.getElementById("progressFill");
 
-
 /* THEME CHANGE */
 function applyTheme(letter){
   const themes={
@@ -243,7 +283,7 @@ setInterval(()=>{
   const h=document.createElement("div");
   h.className="heart";
   h.innerHTML="💜";
-  h.style.left=Math.random()*100+"vw";
+  h.style.left=Math.random()*95+"vw";
   document.body.appendChild(h);
   setTimeout(()=>h.remove(),6000);
 },300);
@@ -257,6 +297,10 @@ function startCalculation(){
   const n1=name1.value.trim();
   const n2=name2.value.trim();
   if(!n1||!n2) return alert("Enter both names 😅");
+
+  document.activeElement && document.activeElement.blur(); // close mobile keyboard
+  result.classList.remove("show");
+  progressFill.style.width="0%";
 
   let p=0;
   let int=setInterval(()=>{
@@ -319,12 +363,16 @@ async function showResult(letter){
 
   createEmojiRain(finalEmoji);
 
-  await addDoc(collection(db,"loveresult"),{
-    name1:name1.value,
-    name2:name2.value,
-    result:finalText,
-    timestamp:new Date()
-  });
+  try{
+    await addDoc(collection(db,"loveresult"),{
+      name1:name1.value,
+      name2:name2.value,
+      result:finalText,
+      timestamp:new Date()
+    });
+  }catch(err){
+    console.error("Save failed:", err);
+  }
 }
 
 function createEmojiRain(e){
@@ -333,23 +381,16 @@ function createEmojiRain(e){
     d.className="emoji-fall";
     d.innerHTML=e;
 
-    d.style.left = Math.random() * 100 + "vw";
+    d.style.left = Math.random() * 95 + "vw";
     d.style.fontSize = (Math.random() * 20 + 15) + "px";
-
-    // random speed
     d.style.animationDuration = (Math.random() * 3 + 3) + "s";
-
-    // random delay (this breaks straight-line effect)
     d.style.animationDelay = (Math.random() * 2) + "s";
 
-    // slight horizontal drift variation
-    d.style.transform = `translateX(${Math.random()*50 - 25}px)`;
-
     document.body.appendChild(d);
-    setTimeout(()=>d.remove(),5000);
+    setTimeout(()=>d.remove(),7000);
   }
 }
 
-</script>    
-</body>    
+</script>
+</body>
 </html>
