@@ -125,6 +125,7 @@ button {
   -webkit-tap-highlight-color:transparent;
 }
 button:hover { transform:scale(1.03); }
+button:disabled { opacity:0.6; cursor:wait; transform:none; }
 button:active { transform:scale(0.97); }
 
 .progress-bar{
@@ -299,6 +300,7 @@ function startCalculation(){
   if(!n1||!n2) return alert("Enter both names 😅");
 
   document.activeElement && document.activeElement.blur(); // close mobile keyboard
+  btn.disabled=true;
   result.classList.remove("show");
   progressFill.style.width="0%";
 
@@ -353,16 +355,10 @@ async function showResult(letter){
     S:["Sister 🤝","🤗"]
   };
 
-  applyTheme(letter);
-
   finalText=meanings[letter][0];
   finalEmoji=meanings[letter][1];
 
-  result.innerHTML = "Relationship: " + finalText + " 🔥";
-  result.classList.add("show");
-
-  createEmojiRain(finalEmoji);
-
+  // 1) Save to Firebase first
   try{
     await addDoc(collection(db,"loveresult"),{
       name1:name1.value,
@@ -373,6 +369,13 @@ async function showResult(letter){
   }catch(err){
     console.error("Save failed:", err);
   }
+
+  // 2) Then show the result
+  applyTheme(letter);
+  result.innerHTML = "Relationship: " + finalText + " 🔥";
+  result.classList.add("show");
+  createEmojiRain(finalEmoji);
+  btn.disabled=false;
 }
 
 function createEmojiRain(e){
