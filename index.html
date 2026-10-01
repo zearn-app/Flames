@@ -9,15 +9,15 @@
 
 <style>    
 :root{
-  --accent:red;
-  --accent2:orange;
+  --accent:#9d4edd;
+  --accent2:#c77dff;
 }
 
 body {    
   margin: 0;    
   height: 100vh;    
   font-family: 'Poppins', sans-serif;    
-  background: radial-gradient(circle at top, #1a0000, #000);    
+  background: radial-gradient(circle at top, #14001f, #000);    
   overflow: hidden;    
   color: white;    
 }
@@ -51,8 +51,6 @@ body::before{
   border-radius:50%;
 }
 
-
-
 @keyframes float {
   0% {
     transform: translateY(100vh) translateX(0px) scale(0.5) rotate(0deg);
@@ -73,13 +71,6 @@ body::before{
   }
 }
 
-
-
-
-
-
-
-
 .container {    
   position: absolute;    
   top: 50%;    
@@ -90,7 +81,7 @@ body::before{
 
 h1 {    
   font-size: 3rem;    
-  color: #ff4d6d;    
+  color: #c77dff;    
   text-shadow: 0 0 20px var(--accent);    
 }    
 
@@ -118,7 +109,7 @@ button:hover { transform: scale(1.1); }
 .progress-bar{
   width:250px;
   height:10px;
-  background:#330000;
+  background:#1f0833;
   border-radius:10px;
   margin:10px auto;
   overflow:hidden;
@@ -143,18 +134,55 @@ button:hover { transform: scale(1.1); }
 }
 
 .share-box{ display:none; }
+
+/* DEVELOPER ID */
+.dev{
+  position:fixed;
+  top:16px;
+  left:50%;
+  transform:translateX(-50%);
+  z-index:10;
+  display:flex;
+  align-items:center;
+  gap:10px;
+  padding:6px 16px 6px 6px;
+  border-radius:50px;
+  background:rgba(255,255,255,0.08);
+  border:1px solid rgba(255,255,255,0.15);
+  backdrop-filter:blur(6px);
+  color:white;
+  text-decoration:none;
+  font-size:0.85rem;
+  transition:0.3s;
+}
+.dev:hover{
+  box-shadow:0 0 15px var(--accent);
+}
+.dev img{
+  width:36px;
+  height:36px;
+  border-radius:50%;
+  object-fit:cover;
+  border:2px solid var(--accent);
+}
+.dev small{
+  display:block;
+  font-size:0.65rem;
+  font-weight:300;
+  opacity:0.7;
+}
 </style>    
 </head>    
 
 <body>    
 
 <div class="container" id="mainBox">    
-  <h1>❤️ FLAMES</h1>    
+  <h1>💜 FLAMES</h1>    
 
   <input type="text" id="name1" placeholder="Your Name">    
   <input type="text" id="name2" placeholder="Her / His Name">    
   <br>    
-  <button id="btn">Check Relationship ❤️</button>    
+  <button id="btn">Check Relationship 💜</button>    
 
   <div class="progress-bar">  
     <div class="progress-fill" id="progressFill"></div>  
@@ -164,6 +192,11 @@ button:hover { transform: scale(1.1); }
   <div class="result" id="result"></div>    
 
 </div>    
+
+<a class="dev" href="https://www.instagram.com/2k_onito_.064?stkn=MTR1bHNvb29hZmFzMQ==" target="_blank" rel="noopener noreferrer">
+  <img src="dp.png" alt="2k_onito_.064" onerror="this.style.display='none'">
+  <span><small>Developed by</small>@2k_onito_.064</span>
+</a>
 
 <script type="module">
 
@@ -194,12 +227,12 @@ const progressFill = document.getElementById("progressFill");
 /* THEME CHANGE */
 function applyTheme(letter){
   const themes={
-    F:["#00c6ff","#0072ff"],
-    L:["#ff4d6d","#ff1a1a"],
-    A:["#ff9a9e","#fad0c4"],
-    M:["#a18cd1","#fbc2eb"],
-    E:["#434343","#000000"],
-    S:["#00ff87","#60efff"]
+    F:["#7b2cbf","#9d4edd"],
+    L:["#9d4edd","#c77dff"],
+    A:["#c77dff","#e0aaff"],
+    M:["#b5179e","#c77dff"],
+    E:["#3c096c","#240046"],
+    S:["#8338ec","#b388eb"]
   };
   document.documentElement.style.setProperty("--accent",themes[letter][0]);
   document.documentElement.style.setProperty("--accent2",themes[letter][1]);
@@ -209,7 +242,7 @@ function applyTheme(letter){
 setInterval(()=>{
   const h=document.createElement("div");
   h.className="heart";
-  h.innerHTML="❤";
+  h.innerHTML="💜";
   h.style.left=Math.random()*100+"vw";
   document.body.appendChild(h);
   setTimeout(()=>h.remove(),6000);
@@ -218,7 +251,7 @@ setInterval(()=>{
 btn.addEventListener("click", startCalculation);
 
 let finalText="";
-let finalEmoji="❤️";
+let finalEmoji="💜";
 
 function startCalculation(){
   const n1=name1.value.trim();
@@ -286,9 +319,7 @@ async function showResult(letter){
 
   createEmojiRain(finalEmoji);
 
-  
-
-  await addDoc(collection(db,"flamesResults7"),{
+  await addDoc(collection(db,"loveresult"),{
     name1:name1.value,
     name2:name2.value,
     result:finalText,
@@ -301,28 +332,23 @@ function createEmojiRain(e){
     let d=document.createElement("div");
     d.className="emoji-fall";
     d.innerHTML=e;
-    
 
+    d.style.left = Math.random() * 100 + "vw";
+    d.style.fontSize = (Math.random() * 20 + 15) + "px";
 
-d.style.left = Math.random() * 100 + "vw";
-d.style.fontSize = (Math.random() * 20 + 15) + "px";
+    // random speed
+    d.style.animationDuration = (Math.random() * 3 + 3) + "s";
 
-// random speed
-d.style.animationDuration = (Math.random() * 3 + 3) + "s";
+    // random delay (this breaks straight-line effect)
+    d.style.animationDelay = (Math.random() * 2) + "s";
 
-// random delay (this breaks straight-line effect)
-d.style.animationDelay = (Math.random() * 2) + "s";
-
-// slight horizontal drift variation
-d.style.transform = `translateX(${Math.random()*50 - 25}px)`;
-
-
+    // slight horizontal drift variation
+    d.style.transform = `translateX(${Math.random()*50 - 25}px)`;
 
     document.body.appendChild(d);
     setTimeout(()=>d.remove(),5000);
   }
 }
-
 
 </script>    
 </body>    
