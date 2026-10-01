@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<title>FLAMES Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
+<style>
+:root{ --accent:#9d4edd; --accent2:#c77dff; }
+*{ box-sizing:border-box; }
+body{
+  margin:0; min-height:100dvh;
+  font-family:'Poppins',sans-serif; color:#fff;
+  background:radial-gradient(circle at top,#14001f,#000) fixed;
+  padding:20px 14px calc(30px + env(safe-area-inset-bottom,0px));
+}
+.wrap{ max-width:900px; margin:0 auto; }
+h1{ font-size:clamp(1.5rem,6vw,2.2rem); color:var(--accent2); margin:0 0 16px; text-shadow:0 0 20px var(--accent); }
+input,button{ font-family:inherit; font-size:16px; border:none; border-radius:12px; outline:none; }
+input{ width:100%; padding:13px 14px; margin:8px 0; }
+button{
+  padding:11px 18px; color:#fff; cursor:pointer;
+  background:linear-gradient(45deg,var(--accent),var(--accent2));
+  box-shadow:0 0 12px var(--accent);
+}
+button:disabled{ opacity:.6; }
+button.ghost{ background:rgba(255,255,255,.1); box-shadow:none; }
+button.del{ background:#5a1230; box-shadow:none; padding:8px 12px; font-size:.8rem; }
+.card{ background:rgba(255,255,255,.07); border:1px solid rgba(255,255,255,.12); border-radius:16px; padding:18px; }
+#login{ max-width:380px; margin:12vh auto 0; }
+#login button{ width:100%; margin-top:8px; min-height:48px; }
+.err{ color:#ff8fa3; font-size:.85rem; min-height:1.2em; margin-top:8px; }
+#app{ display:none; }
+.bar{ display:flex; gap:10px; align-items:center; flex-wrap:wrap; margin-bottom:12px; }
+.bar input{ flex:1; min-width:140px; margin:0; }
+.stats{ display:flex; gap:8px; flex-wrap:wrap; margin-bottom:14px; }
+.chip{ background:rgba(157,78,221,.25); border:1px solid rgba(199,125,255,.4); padding:4px 12px; border-radius:20px; font-size:.8rem; }
+.list{ display:flex; flex-direction:column; gap:10px; }
+.row{ display:grid; grid-template-columns:1fr auto; gap:6px 12px; align-items:center; }
+.names{ font-weight:500; word-break:break-word; }
+.res{ font-size:.95rem; }
+.time{ font-size:.75rem; opacity:.65; }
+.empty{ text-align:center; opacity:.7; padding:30px 0; }
+@media (min-width:640px){
+  .row{ grid-template-columns:1.6fr 1fr 1.2fr auto; }
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div id="login" class="card">
+    <h1>💜 Admin</h1>
+    <input type="email" id="email" placeholder="Admin email" autocomplete="username">
+    <input type="password" id="pass" placeholder="Password" autocomplete="current-password">
+    <button id="loginBtn">Sign in</button>
+    <div class="err" id="loginErr"></div>
+  </div>
+
+  <div id="app">
+    <div class="bar" style="justify-content:space-between">
+      <h1 style="margin:0">💜 FLAMES Results</h1>
+      <button class="ghost" id="logoutBtn">Sign out</button>
+    </div>
+    <div class="bar">
+      <input type="search" id="search" placeholder="Search names or result">
+    </div>
+    <div class="stats" id="stats"></div>
+    <div class="err" id="appErr"></div>
+    <div class="list" id="list"></div>
+  </div>
+
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import { getFirestore, collection, query, orderBy, limit, onSnapshot, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+const app = initializeApp({
+  apiKey: "AIzaSyAbYt_z5GaqOTcVlz3FRjssTwC7Uzv_MdA",
+  authDomain: "information-b9593.firebaseapp.com",
+  projectId: "information-b9593",
+  storageBucket: "information-b9593.firebasestorage.app",
+  messagingSenderId: "767588407430",
+  appId: "1:767588407430:web:006bb7ff0b7c66b751d907",
+  measurementId: "G-CZ9KF73J6T"
+});
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+const $ = id => document.getElementById(id);
+let items = [];
+let unsub = null;
+
+$("loginBtn").onclick = async () => {
+  $("loginErr").textContent = "";
+  $("loginBtn").disabled = true;
+  try{
+    await signInWithEmailAndPassword(auth, $("email").value.trim(), $("pass").value);
+  }catch(e){
+    $("loginErr").textContent = "Sign in failed: " + (e.code || e.message);
+  }
+  $("loginBtn").disabled = false;
+};
+$("pass").addEventListener("keydown", e => { if(e.key==="Enter") $("loginBtn").click(); });
+$("logoutBtn").onclick = () => signOut(auth);
+$("search").addEventListener("input", render);
+
+onAuthStateChanged(auth, user => {
+  if(user){
+    $("login").style.display = "none";
+    $("app").style.display = "block";
+    listen();
+  }else{
+    if(unsub){ unsub(); unsub = null; }
+    items = [];
+    $("app").style.display = "none";
+    $("login").style.display = "block";
+  }
+});
+
+function listen(){
+  const q = query(collection(db,"loveresult"), orderBy("timestamp","desc"), limit(500));
+  unsub = onSnapshot(q, snap => {
+    $("appErr").textContent = "";
+    items = snap.docs.map(d => ({ id:d.id, ...d.data() }));
+    render();
+  }, err => {
+    $("appErr").textContent = "Cannot load: " + err.code + " (check Firestore rules for this email)";
+  });
+}
+
+function esc(s){ return String(s ?? "").replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+function fmt(t){
+  const d = t && t.toDate ? t.toDate() : null;
+  return d ? d.toLocaleString([], {dateStyle:"medium", timeStyle:"short"}) : "";
+}
+
+function render(){
+  const term = $("search").value.trim().toLowerCase();
+  const shown = items.filter(i =>
+    !term || (i.name1+" "+i.name2+" "+i.result).toLowerCase().includes(term));
+
+  const counts = {};
+  items.forEach(i => { const k = String(i.result||"").split(" ")[0]; counts[k] = (counts[k]||0)+1; });
+  $("stats").innerHTML =
+    `<span class="chip">Total: ${items.length}</span>` +
+    Object.entries(counts).map(([k,v]) => `<span class="chip">${esc(k)}: ${v}</span>`).join("");
+
+  $("list").innerHTML = shown.length ? shown.map(i => `
+    <div class="card row">
+      <div class="names">${esc(i.name1)} 💜 ${esc(i.name2)}</div>
+      <div class="res">${esc(i.result)}</div>
+      <div class="time">${esc(fmt(i.timestamp))}</div>
+      <button class="del" data-id="${esc(i.id)}">Delete</button>
+    </div>`).join("") : `<div class="empty">No results yet</div>`;
+}
+
+$("list").addEventListener("click", async e => {
+  const id = e.target.dataset && e.target.dataset.id;
+  if(!id || !confirm("Delete this entry?")) return;
+  try{ await deleteDoc(doc(db,"loveresult",id)); }
+  catch(err){ $("appErr").textContent = "Delete failed: " + err.code; }
+});
+</script>
+</body>
+</html>
