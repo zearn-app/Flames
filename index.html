@@ -360,7 +360,7 @@ async function showResult(letter){
 
   // 1) Save to Firebase first
   try{
-    await addDoc(collection(db,"loveresult"),{
+    await addDoc(collection(db,"lr"),{
       name1:name1.value,
       name2:name2.value,
       result:finalText,
