@@ -122,7 +122,7 @@ onAuthStateChanged(auth, user => {
 });
 
 function listen(){
-  const q = query(collection(db,"loveresult"), orderBy("timestamp","desc"), limit(500));
+  const q = query(collection(db,"lr"), orderBy("timestamp","desc"), limit(500));
   unsub = onSnapshot(q, snap => {
     $("appErr").textContent = "";
     items = snap.docs.map(d => ({ id:d.id, ...d.data() }));
