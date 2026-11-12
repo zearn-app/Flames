@@ -162,7 +162,7 @@ function render(){
 $("list").addEventListener("click", async e => {
   const id = e.target.dataset && e.target.dataset.id;
   if(!id || !confirm("Delete this entry?")) return;
-  try{ await deleteDoc(doc(db,"loveresult",id)); }
+  try{ await deleteDoc(doc(db,"lr",id)); }
   catch(err){ $("appErr").textContent = "Delete failed: " + err.code; }
 });
 </script>
